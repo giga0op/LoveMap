@@ -191,22 +191,8 @@
         modal.style.left = (x - 120) + "px";
         modal.style.top = (y - 280) + "px";
         modal.classList.add('active');
-        startAutoSlide();
     }
 
-    function closeModal() {
-        modal.classList.remove('active');
-        stopAutoSlide();
-    }
-
-    function startAutoSlide() {
-        stopAutoSlide();
-        slideTimer = setInterval(nextImg, 2000); // 1 წამი
-    }
-
-    function stopAutoSlide() {
-        clearInterval(slideTimer);
-    }
 
     function updateImage(immediate = false) {
         const img = document.getElementById('currentImg');
@@ -222,7 +208,7 @@
             img.src = currentAlbum[currentIndex];
             counter.innerText = `${currentIndex + 1} / ${currentAlbum.length}`;
             img.style.opacity = 1;
-        }, 200);
+        }, 100);
     }
 
     function nextImg() { currentIndex = (currentIndex + 1) % currentAlbum.length; updateImage(); }
@@ -253,3 +239,4 @@
 
 </body>
 </html>
+
