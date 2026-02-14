@@ -1,242 +1,250 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Love Map Journey</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            height: 100vh; width: 100vw; overflow: hidden; 
-            font-family: 'Segoe UI', sans-serif; background: #000; 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Love Map Journey</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+height: 100vh; width: 100vw; overflow: hidden;
+font-family: 'Segoe UI', sans-serif; background: #000;
+}
 
-        .background {
-            position: fixed; inset: 0;
-            background: url("1.png") center center / cover no-repeat;
-            z-index: -1;
-        }
+.background {
+position: fixed; inset: 0;
+background: url("1.png") center center / cover no-repeat;
+z-index: -1;
+}
 
-        .map-container {
-            height: 100vh; width: 100vw;
-            display: flex; justify-content: center; align-items: center;
-        }
+.map-container {
+height: 100vh; width: 100vw;
+display: flex; justify-content: center; align-items: center;
+}
 
-        .map-wrapper { position: relative; display: inline-block; }
+.map-wrapper { position: relative; display: inline-block; }
 
-        .map {
-            max-width: 90vw; max-height: 80vh;
-            filter: drop-shadow(0 0 40px rgba(255, 120, 200, 0.4));
-            border-radius: 20px; display: block;
-        }
+.map {
+max-width: 90vw; max-height: 80vh;
+filter: drop-shadow(0 0 40px rgba(255, 120, 200, 0.4));
+border-radius: 20px; display: block;
+}
 
-        .pin-trigger {
-            position: absolute; 
-            width: 70px; height: 70px;
-            cursor: pointer; border-radius: 50%; z-index: 10;
-            background: rgba(255, 120, 200, 0.2);
-            animation: pulse 2s infinite;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+.pin-trigger {
+position: absolute;
+width: 70px; height: 70px;
+cursor: pointer; border-radius: 50%; z-index: 10;
+background: rgba(255, 120, 200, 0.2);
+animation: pulse 2s infinite;
+transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 120, 200, 0.7); transform: scale(1); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 120, 200, 0); transform: scale(1.1); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 120, 200, 0); transform: scale(1); }
-        }
+@keyframes pulse {
+0% { box-shadow: 0 0 0 0 rgba(255, 120, 200, 0.7); transform: scale(1); }
+70% { box-shadow: 0 0 0 15px rgba(255, 120, 200, 0); transform: scale(1.1); }
+100% { box-shadow: 0 0 0 0 rgba(255, 120, 200, 0); transform: scale(1); }
+}
 
-        .pin-hit { animation: pinBounce 0.5s ease !important; }
-        @keyframes pinBounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.4); }
-        }
+.pin-hit { animation: pinBounce 0.5s ease !important; }
+@keyframes pinBounce {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.4); }
+}
 
-        #motorcycle {
-            position: fixed; font-size: 35px; z-index: 100;
-            pointer-events: none; display: none;
-            transition: all 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
-        }
+#motorcycle {
+position: fixed; font-size: 35px; z-index: 100;
+pointer-events: none; display: none;
+transition: all 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+}
 
-        .modal {
-            display: none; position: fixed;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px); padding: 15px;
-            border-radius: 25px; box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
-            z-index: 1000; width: 300px; opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translate(0, 10px) scale(0.9);
-        }
+.modal {
+display: none; position: fixed;
+background: rgba(255, 255, 255, 0.85);
+backdrop-filter: blur(15px); padding: 15px;
+border-radius: 25px; box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+z-index: 1000; width: 300px; opacity: 0;
+transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+transform: translate(0, 10px) scale(0.9);
+}
 
-        .modal.active { display: block; opacity: 1; transform: translate(0, 0) scale(1); }
+.modal.active { display: block; opacity: 1; transform: translate(0, 0) scale(1); }
 
-        .slider-container { width: 100%; height: 220px; overflow: hidden; border-radius: 18px; margin-bottom: 12px; }
-        .slider-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
-        
-        .controls { display: flex; justify-content: space-between; align-items: center; }
-        .btn { 
-            background: linear-gradient(135deg, #ff78c8, #ffb2e0); 
-            color: white; border: none; width: 42px; height: 42px; 
-            border-radius: 50%; cursor: pointer;
-        }
+.slider-container { width: 100%; height: 220px; overflow: hidden; border-radius: 18px; margin-bottom: 12px; }
+.slider-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
 
-        .close-btn { 
-            position: absolute; top: -10px; right: -10px; 
-            background: #ff4b4b; color: white; border: none; 
-            width: 30px; height: 30px; border-radius: 50%; cursor: pointer; 
-        }
+.controls { display: flex; justify-content: space-between; align-items: center; }
+.btn {
+background: linear-gradient(135deg, #ff78c8, #ffb2e0);
+color: white; border: none; width: 42px; height: 42px;
+border-radius: 50%; cursor: pointer;
+}
 
-        .heart-particle { position: fixed; bottom: -20px; pointer-events: none; z-index: 5; animation: floatUp linear forwards; }
-        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-110vh); opacity: 0; } }
+.close-btn {
+position: absolute; top: -10px; right: -10px;
+background: #ff4b4b; color: white; border: none;
+width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+}
 
-        @media only screen and (max-width: 768px) {
-            body * { display: none !important; }
-            body::before {
-                content: "გახსენი კომპიუტერიდან მეთქიიი :D 💻❤️";
-                display: flex !important; position: fixed; inset: 0;
-                background: #ff78c8; color: white; font-size: 24px;
-                text-align: center; align-items: center; justify-content: center;
-                padding: 20px; z-index: 99999;
-            }
-        }
-    </style>
+.heart-particle { position: fixed; bottom: -20px; pointer-events: none; z-index: 5; animation: floatUp linear forwards; }
+@keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-110vh); opacity: 0; } }
+
+@media only screen and (max-width: 768px) {
+body * { display: none !important; }
+body::before {
+content: "გახსენი კომპიუტერიდან მეთქიიი :D 💻❤️";
+display: flex !important; position: fixed; inset: 0;
+background: #ff78c8; color: white; font-size: 24px;
+text-align: center; align-items: center; justify-content: center;
+padding: 20px; z-index: 99999;
+}
+}
+</style>
 </head>
 <body>
 
 <audio id="mySong" loop>
-    <source src="love_song.mp3" type="audio/mpeg">
+<source src="love_song.mp3" type="audio/mpeg">
 </audio>
 
 <div class="background"></div>
 <div id="motorcycle">🛵</div>
 
 <div class="map-container">
-    <div class="map-wrapper" id="mapWrapper">
-        <img src="2.png" alt="Our Love Map" class="map">
-        
-        <div class="pin-trigger" style="top: 55%; left: 25%;" onclick="handleJourney(event, 'batumi')"></div>
-        <div class="pin-trigger" style="top: 57%; left: 48%;" onclick="handleJourney(event, 'tbilisi')"></div>
-        <div class="pin-trigger" style="top: 37%; left: 59%;" onclick="handleJourney(event, 'gudauri')"></div>
-        <div class="pin-trigger" style="top: 56%; left: 68%;" onclick="handleJourney(event, 'telavi')"></div>
-    </div>
+<div class="map-wrapper" id="mapWrapper">
+<img src="2.png" alt="Our Love Map" class="map">
+
+<div class="pin-trigger" style="top: 55%; left: 25%;" onclick="handleJourney(event, 'batumi')"></div>
+<div class="pin-trigger" style="top: 57%; left: 48%;" onclick="handleJourney(event, 'tbilisi')"></div>
+<div class="pin-trigger" style="top: 37%; left: 59%;" onclick="handleJourney(event, 'gudauri')"></div>
+<div class="pin-trigger" style="top: 56%; left: 68%;" onclick="handleJourney(event, 'telavi')"></div>
+</div>
 </div>
 
-<div id="photoModal" class="modal">
-    <button class="close-btn" onclick="closeModal()">✕</button>
-    <div class="slider-container">
-        <img id="currentImg" class="slider-img" src="">
-    </div>
-    <div class="controls">
-        <button class="btn" onclick="prevImg()">❮</button>
-        <span id="imgCounter" style="color: #ff78c8; font-weight: bold; font-size: 13px;"></span>
-        <button class="btn" onclick="nextImg()">❯</button>
-    </div>
+<div id="photoModal" class="modal" onmouseenter="stopAutoSlide()" onmouseleave="startAutoSlide()">
+<button class="close-btn" onclick="closeModal()">✕</button>
+<div class="slider-container">
+<img id="currentImg" class="slider-img" src="">
+</div>
+<div class="controls">
+<button class="btn" onclick="prevImg()">❮</button>
+<span id="imgCounter" style="color: #ff78c8; font-weight: bold; font-size: 13px;"></span>
+<button class="btn" onclick="nextImg()">❯</button>
+</div>
 </div>
 
 <script>
-    const album = {
-        batumi: ["bt3.jpeg", "bt2.jpeg", "bt5.jpeg", "bt4.jpeg", "bt1.jpeg"],
-        tbilisi: ["Untitled.jpg", "tb1.jpeg", "tb2.jpeg"],
-        gudauri: ["g1.jpeg", "g2.jpeg", "g3.jpeg"],
-        telavi: ["te1.jpeg", "te2.jpeg"]
-    };
+const album = {
+batumi: ["bt3.jpeg", "bt2.jpeg", "bt5.jpeg", "bt4.jpeg", "bt1.jpeg"],
+tbilisi: ["Untitled.jpg", "tb1.jpeg", "tb2.jpeg"],
+gudauri: ["g1.jpeg", "g2.jpeg", "g3.jpeg"],
+telavi: ["te1.jpeg", "te2.jpeg"]
+};
 
-    let currentAlbum = [];
-    let currentIndex = 0;
-    let isFirstClick = true;
-    let slideTimer;
-    
-    const moto = document.getElementById('motorcycle');
-    const modal = document.getElementById('photoModal');
-    const song = document.getElementById('mySong');
+let currentAlbum = [];
+let currentIndex = 0;
+let isFirstClick = true;
+let slideTimer;
 
-    // ეს არის მთავარი ფუნქცია, რომელიც შეცდომას აღარ მოგცემს
-    function handleJourney(e, city) {
-        // მუსიკის ჩართვა
-        if (song.paused) {
-            song.play().catch(err => console.log("მუსიკის ჩართვა ვერ მოხერხდა: ", err));
-        }
+const moto = document.getElementById('motorcycle');
+const modal = document.getElementById('photoModal');
+const song = document.getElementById('mySong');
 
-        closeModal();
-        
-        const pin = e.currentTarget; // შევცვალე currentTarget-ით უფრო საიმედოობისთვის
-        const rect = pin.getBoundingClientRect();
-        const targetX = rect.left + rect.width / 2 - 20;
-        const targetY = rect.top + rect.height / 2 - 20;
+// ეს არის მთავარი ფუნქცია, რომელიც შეცდომას აღარ მოგცემს
+function handleJourney(e, city) {
+// მუსიკის ჩართვა
+if (song.paused) {
+song.play().catch(err => console.log("მუსიკის ჩართვა ვერ მოხერხდა: ", err));
+}
 
-        if (isFirstClick) {
-            moto.style.left = targetX + "px";
-            moto.style.top = targetY + "px";
-            moto.style.display = "block";
-            isFirstClick = false;
-            openSlider(targetX, targetY, city);
-        } else {
-            const currentX = parseInt(moto.style.left) || 0;
-            moto.style.transform = targetX > currentX ? "scaleX(1)" : "scaleX(-1)";
-            moto.style.left = targetX + "px";
-            moto.style.top = targetY + "px";
+closeModal();
 
-            setTimeout(() => {
-                pin.classList.add('pin-hit');
-                setTimeout(() => pin.classList.remove('pin-hit'), 500);
-                openSlider(targetX, targetY, city);
-            }, 1200);
-        }
-    }
+const pin = e.currentTarget; // შევცვალე currentTarget-ით უფრო საიმედოობისთვის
+const rect = pin.getBoundingClientRect();
+const targetX = rect.left + rect.width / 2 - 20;
+const targetY = rect.top + rect.height / 2 - 20;
 
-    function openSlider(x, y, city) {
-        currentAlbum = album[city];
-        currentIndex = 0;
-        updateImage(true);
-        modal.style.left = (x - 120) + "px";
-        modal.style.top = (y - 280) + "px";
-        modal.classList.add('active');
-    }
+if (isFirstClick) {
+moto.style.left = targetX + "px";
+moto.style.top = targetY + "px";
+moto.style.display = "block";
+isFirstClick = false;
+openSlider(targetX, targetY, city);
+} else {
+const currentX = parseInt(moto.style.left) || 0;
+moto.style.transform = targetX > currentX ? "scaleX(1)" : "scaleX(-1)";
+moto.style.left = targetX + "px";
+moto.style.top = targetY + "px";
+
+setTimeout(() => {
+pin.classList.add('pin-hit');
+setTimeout(() => pin.classList.remove('pin-hit'), 500);
+openSlider(targetX, targetY, city);
+}, 1200);
+}
+}
+
+function openSlider(x, y, city) {
+currentAlbum = album[city];
+currentIndex = 0;
+updateImage(true);
+modal.style.left = (x - 120) + "px";
+modal.style.top = (y - 280) + "px";
+modal.classList.add('active');
+startAutoSlide();
+}
+
+function closeModal() {
+modal.classList.remove('active');
+//stopAutoSlide();
+}
 
 
-    function updateImage(immediate = false) {
-        const img = document.getElementById('currentImg');
-        const counter = document.getElementById('imgCounter');
-        if (immediate) {
-            img.src = currentAlbum[currentIndex];
-            counter.innerText = `${currentIndex + 1} / ${currentAlbum.length}`;
-            img.style.opacity = 1;
-            return;
-        }
-        img.style.opacity = 0;
-        setTimeout(() => {
-            img.src = currentAlbum[currentIndex];
-            counter.innerText = `${currentIndex + 1} / ${currentAlbum.length}`;
-            img.style.opacity = 1;
-        }, 100);
-    }
 
-    function nextImg() { currentIndex = (currentIndex + 1) % currentAlbum.length; updateImage(); }
-    function prevImg() { currentIndex = (currentIndex - 1 + currentAlbum.length) % currentAlbum.length; updateImage(); }
 
-    // გულების ეფექტი
-    setInterval(() => {
-        const heart = document.createElement('div');
-        heart.classList.add('heart-particle');
-        heart.innerHTML = ['❤', '💖', '💕', '✨'][Math.floor(Math.random()*4)];
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-        heart.style.color = `hsl(${Math.random() * 30 + 330}, 100%, 85%)`;
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 6000);
-    }, 500);
 
-    // რუკის ტივტივი
-    const mapWrapper = document.getElementById('mapWrapper');
-    let angle = 0;
-    function animate() {
-        angle += 0.02;
-        mapWrapper.style.transform = `translateY(${Math.sin(angle) * 8}px)`;
-        requestAnimationFrame(animate);
-    }
-    animate();
+function updateImage(immediate = false) {
+const img = document.getElementById('currentImg');
+const counter = document.getElementById('imgCounter');
+if (immediate) {
+img.src = currentAlbum[currentIndex];
+counter.innerText = `${currentIndex + 1} / ${currentAlbum.length}`;
+img.style.opacity = 1;
+return;
+}
+img.style.opacity = 0;
+setTimeout(() => {
+img.src = currentAlbum[currentIndex];
+counter.innerText = `${currentIndex + 1} / ${currentAlbum.length}`;
+img.style.opacity = 1;
+}, 200);
+}
+
+function nextImg() { currentIndex = (currentIndex + 1) % currentAlbum.length; updateImage(); }
+function prevImg() { currentIndex = (currentIndex - 1 + currentAlbum.length) % currentAlbum.length; updateImage(); }
+
+// გულების ეფექტი
+setInterval(() => {
+const heart = document.createElement('div');
+heart.classList.add('heart-particle');
+heart.innerHTML = ['❤', '💖', '💕', '✨'][Math.floor(Math.random()*4)];
+heart.style.left = Math.random() * 100 + "vw";
+heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+heart.style.color = `hsl(${Math.random() * 30 + 330}, 100%, 85%)`;
+document.body.appendChild(heart);
+setTimeout(() => heart.remove(), 6000);
+}, 500);
+
+// რუკის ტივტივი
+const mapWrapper = document.getElementById('mapWrapper');
+let angle = 0;
+function animate() {
+angle += 0.02;
+mapWrapper.style.transform = `translateY(${Math.sin(angle) * 8}px)`;
+requestAnimationFrame(animate);
+}
+animate();
 </script>
 
 </body>
 </html>
-
